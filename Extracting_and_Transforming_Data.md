@@ -1,0 +1,10 @@
+- Transforming Apache logs into TSV format using MapReduce
+- Using Apache Pig to filter bot traffic from web server logs
+- Using Apache Pig to sort web server log data by timestamp
+- Using Apache Pig to sessionize web server log data
+- Using Python to extend Apache Pig functionality
+- Using MapReduce and secondary sort to calculate page views
+- Using Hive and Python to clean and transform geographical event data
+- Using Python and Hadoop Streaming to perform a time series analytic
+- Using MultipleOutputs in MapReduce to name output files
+- Creating custom Hadoop Writable and InputFormat to read geographical event data
