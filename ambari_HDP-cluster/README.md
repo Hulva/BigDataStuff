@@ -77,18 +77,16 @@ Hadoop 强烈依赖 DNS。Hadoop relies heavily on DNS, and as such performs man
 
 Ambari 在运行 setup 过程期间会检查 iptables 是否启用，如果出现了warning且你没有关闭iptables，那么你就要检查是否所有所需的端口都已对外开放且可用。
 
-暂时关闭 iptables
+  暂时关闭 iptables
   ```
   chkconfig iptables off
   /etc/init.d/iptables stop
   ```
-
   ```
   systemctl disable firewalld
   service firewalld stop
   ```
-
-或者是保持 iptables 开启，配置所需的端口开放可用即可。所需开放[端口](http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.2.0/bk_ambari-reference/content/ch_configuring_network_port_numbers.html)
+  或者是保持 iptables 开启，配置所需的端口开放可用即可。所需开放[端口](http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.2.0/bk_ambari-reference/content/ch_configuring_network_port_numbers.html)
 
 ## Disable SELinux and PackageKit and check the umask Value
 
@@ -102,3 +100,38 @@ Ambari 在运行 setup 过程期间会检查 iptables 是否启用，如果出�
   为所有交互用户更改umask： `echo umask 0022 >> /etc/profile`
 
 http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.2.0/bk_ambari-installation/content/disable_selinux_and_packagekit_and_check_the_umask_value.html
+
+## 准备好 Ambari 仓库的配置文件
+
+1. 从公共仓库下载 ambari.repo
+  http://public-repo-1.hortonworks.com/ambari/<OS>/2.x/updates/2.4.2.0/ambari.repo
+2. 编辑 ambari.repo 文件替换其中的 Amabri Base URL 为本地仓库
+  ```
+  [Updates-Ambari-2.4.2.0]
+  name=Ambari-2.4.2.0-Updates
+  baseurl=INSERT-BASE-URL
+  gpgcheck=1
+  gpgkey=http://public-repo-1.hortonworks.com/ambari/centos6/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+  enabled=1
+  priority=1
+  ```
+  可以通过设置`gpgcheck=0`来禁用GPG检查。或者保持GPG检查开启而将`gpgkey`替换为本地仓库中的URL。
+3. 将 `ambari.repo` 文件放置到将要安装 Ambari Server 的机器上
+  对于 RHEL/CentOS/Oracle Linux:
+  `/etc/yum.repos.d/ambari.repo`
+  对于 SLES:
+  `/etc/zypp/repos.d/ambari.repo`
+  对于Debain/Ubuntu:
+  `/etc/apt/sources.list.d/ambari.list`
+  编辑 `/etc/yum/pluginconf.d/priorities.conf` 文件添加以下内容:
+  ```
+  [main]
+  enabled=1
+  gpgcheck=0
+  ```
+# 安装 Ambari Server
+`yum install ambari-server`
+`ambari-server setup`
+
+# 安装 配置 和 部署 HDP 集群
+使用 本地仓库 时，勾选 `Use RedHat Satellite/Spacewalk`
